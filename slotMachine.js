@@ -16,18 +16,20 @@ var SlotMachine = /** @class */ (function () {
     };
     SlotMachine.prototype.calculatePayout = function (result) {
         var totalPayout = 0;
+        var lines = [];
         for (var _i = 0, _a = this.config.lines; _i < _a.length; _i++) {
             var line = _a[_i];
             var lineSymbols = [];
-            for (var i = 0; i < line.length; i++) { //5
+            for (var i = 0; i < line.length; i++) {
                 lineSymbols.push(result[i][line[i]]);
             }
+            lines.push(lineSymbols);
             var _loop_1 = function (symbol) {
-                var symbolIndex = parseInt(symbol); //1
-                var payout_1 = this_1.config.symbols[symbolIndex]; // [0, 0, 10, 20, 50], .length(5)
-                var count = lineSymbols.filter(function (s) { return s === symbolIndex; }).length; //[1, 1, 1]
+                var symbolIndex = parseInt(symbol);
+                var payout = this_1.config.symbols[symbolIndex];
+                var count = lineSymbols.filter(function (s) { return s === symbolIndex; }).length;
                 if (count > 0) {
-                    totalPayout += payout_1[count - 1];
+                    totalPayout += payout[count - 1];
                 }
             };
             var this_1 = this;
@@ -35,15 +37,14 @@ var SlotMachine = /** @class */ (function () {
                 var symbol = _c[_b];
                 _loop_1(symbol);
             }
-            // console.log('ttt', lineSymbols);
         }
-        return totalPayout;
+        return { totalPayout: totalPayout, lines: lines };
     };
     return SlotMachine;
 }());
 var slotMachine = new SlotMachine(configuration_1.default);
 var result = slotMachine.spin();
-// const payout = slotMachine.calculatePayout([[1, 4, 4, 5, 6], [1, 4, 5, 6 ],[1, 4, 5, 6 ],[9, 4, 5, 6 ], [9, 4, 5, 6 ] ]);
-var payout = slotMachine.calculatePayout(result);
-// console.log("Result: ", result);
-console.log("Payout: ", payout);
+var _a = slotMachine.calculatePayout(result), totalPayout = _a.totalPayout, lines = _a.lines;
+console.log("Game result: ", result);
+console.log("Lines payout", lines);
+console.log("Payout: ", totalPayout);
