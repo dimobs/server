@@ -33,9 +33,10 @@ class SlotMachine {
         return result;
     }
 
-    calculatePayout(result: number[][]): {totalPayout: number; lines: number[][] }  {
+    calculatePayout(result: number[][]): {totalPayout: number; lines: number[][], symbolsReached }  {
         let totalPayout = 0;
         const lines: number[][] = [];
+        const symbolsReached: { reelPosition: number; symbol: number}[] = [];
 
         for (const line of this.config.lines) { 
             const lineSymbols: number[] = [];
@@ -48,19 +49,20 @@ class SlotMachine {
                 const symbolIndex = parseInt(symbol); 
                 const payout = this.config.symbols[symbolIndex]; 
                 const count = lineSymbols.filter(s => s === symbolIndex).length; 
-                if (count > 0) {
+                if (count > 0 && payout[count - 1] > 0) {
                     totalPayout += payout[count - 1];
+                    symbolsReached.push({ reelPosition: symbolIndex, symbol: payout[count - 1] });
                 }
             }
         }
 
-        return { totalPayout, lines };
+        return { totalPayout, lines, symbolsReached };
     }
 }
 
 const slotMachine = new SlotMachine(config);
 const result = slotMachine.spin();
-const {totalPayout, lines} = slotMachine.calculatePayout(result);
-console.log("Game result: ", result);
-console.log("Lines payout", lines);
+const {totalPayout, lines, symbolsReached } = slotMachine.calculatePayout(result);
+console.log("Game result: ", result, );
+console.log("Lines payout", lines, symbolsReached);
 console.log("Payout: ", totalPayout);
